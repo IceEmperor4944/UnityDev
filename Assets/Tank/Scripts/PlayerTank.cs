@@ -1,8 +1,8 @@
 using TMPro;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class PlayerTank : MonoBehaviour, IDamageable
+public class PlayerTank : MonoBehaviour
 {
     [SerializeField] float maxTorque = 90;
     [SerializeField] float maxForce = 1;
@@ -12,11 +12,13 @@ public class PlayerTank : MonoBehaviour, IDamageable
     public float health = 50;
     [SerializeField] TMP_Text ammoText;
     [SerializeField] TMP_Text healthText;
+    [SerializeField] Slider healthBar;
 
     float torque;
     float force;
 
     Rigidbody rb;
+    Destructable dest;
 
     public bool dead = false;
     public bool win = false;
@@ -26,6 +28,7 @@ public class PlayerTank : MonoBehaviour, IDamageable
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        dest = GetComponent<Destructable>();
     }
 
     void Update()
@@ -49,14 +52,19 @@ public class PlayerTank : MonoBehaviour, IDamageable
         }
 
         ammoText.text = "Ammo: " + ammo.ToString();
-        healthText.text = "Health: " + health.ToString();
+        healthText.text = "Health: " + dest.Health.ToString();
+        healthBar.value = dest.Health;
+        if(dest.Health <= 0)
+        {
+            GameManager.Instance.SetLose();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject == end)
         {
-            win = true;
+            GameManager.Instance.SetWin();
             transform.position = start.transform.position;
         }
     }
@@ -66,19 +74,5 @@ public class PlayerTank : MonoBehaviour, IDamageable
     {
         rb.AddRelativeForce(Vector3.forward * force);
         rb.AddRelativeTorque(Vector3.up * torque);
-    }
-
-    public void ApplyDamage(float damage)
-    {
-        health -= damage;
-        if (health <= 0)
-        {
-            dead = true;
-            //game over screen
-
-
-            transform.position = start.transform.position;
-            //dead = false; //this will change w/ game over screen
-        }
     }
 }

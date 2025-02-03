@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Turret : Destructable
 {
-    [SerializeField] Transform barrel;
     [SerializeField] GameObject rocket;
+    [SerializeField] Transform barrel;
 
     float torque;
     float force;
